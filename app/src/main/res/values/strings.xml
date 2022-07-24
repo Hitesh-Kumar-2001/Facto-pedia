@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">FactoPedia</string>
+    <string name="bold"><b>BOLD</b></string>
+    <string name="italic"><i>italic</i></string>
+    <string name="underline"><u>underline</u></string>
+    <string name="heading">Fake News Fast Check</string>
+</resources>
