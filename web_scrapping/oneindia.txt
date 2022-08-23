@@ -1,0 +1,110 @@
+package org.example;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
+import java.io.IOException;
+
+
+public class Main {
+    private static final String search_url = "https://www.oneindia.com/search/results.html?q=";
+    private static final String site_url = "https://www.oneindia.com/";
+    public static final String searc_string = "&tab=oneindia";
+
+    private static final String query = "elon musk";
+
+    public static void main(String[] args) throws IOException {
+        String url = "";
+        String query2 = query_convert(query);
+        url = search_url+query2;
+
+        try{
+            System.out.println(url);
+            Document doc = Jsoup.connect(url).timeout(10000).get();
+            Elements body = doc.select("ul.news-block");
+            body = body.select("div.text-head").select("a");
+
+            for (Element link : body) {
+                String linkHref = link.attr("href");
+                if (linkHref.contains("fact-check")) {
+                    linkHref = site_url + linkHref;
+                    data_reciever(linkHref);
+                }
+            }
+        }catch (Exception ignore) { }
+
+
+    }
+
+
+
+
+
+    static String query_convert(String query)
+    {
+        StringBuilder new_query = new StringBuilder();
+        for (int i = 0; i< Main.query.length(); i++)
+        {
+            if(query.charAt(i)==' ')
+            {
+                new_query.append("%20");
+            }
+            else new_query.append(query.charAt(i));
+        }
+        new_query.append(searc_string);
+        return new_query.toString();
+    }
+
+    static String data_reciever(String url) {
+        String nothing = "";
+        System.out.println(url);
+        try{
+
+            Document doc = Jsoup.connect(url).timeout(10000).get();
+            String title = doc.select("h1.heading").text();
+            System.out.println(title);
+            String claim_rating = doc.select("div.oi-factcheck-block > div").text();
+            System.out.println(claim_rating);
+            String date = doc.select("div.time-date.date-time").select("time").attr("datetime");
+            date = date_covert(date);
+            System.out.println(date);
+            String story = doc.select("div.oi-article-lt").select("p").first().text();
+            System.out.println(story);
+            String author  = doc.select("div.author-profile.written-by").select("a").text();
+            System.out.println(author);
+            String conclusion = doc.select("div.oi-factcheck-block").get(1).select("p").text();
+            System.out.println(conclusion);
+
+
+
+        }catch (Exception ignore) { }
+
+
+        return nothing;
+    }
+
+    private static String date_covert(String date) {
+        StringBuilder new_date= new StringBuilder("");
+        int n = date.length();
+        int index = 0;
+        for(int i =0;i<n;i++)
+        {
+            if(Character.isLetter(date.charAt(i)))
+            {
+                index = i;
+                break;
+            }
+        }
+        for(int i =0;i<index;i++)
+        {
+            new_date.append(date.charAt(i));
+        }
+
+        return new_date.toString();
+    }
+
+
+}
+
+

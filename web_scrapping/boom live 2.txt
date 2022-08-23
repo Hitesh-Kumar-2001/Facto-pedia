@@ -1,0 +1,88 @@
+package org.example;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
+import java.io.IOException;
+
+
+public class Main {
+    private static final String base_url = "https://www.boomlive.in/search?q=";
+    private static final String site_url = "https://www.boomlive.in/";
+
+    private static final String query = "elon musk";
+
+    public static void main(String[] args) throws IOException {
+        String url = "";
+        String query2 = query_convert(query);
+        url = base_url+query2;
+        System.out.println(url);
+        try{
+            Document doc = Jsoup.connect(url).timeout(10000).get();
+            Elements body = doc.select("div.card-wrapper.horizontal-card");
+            body = body.select("figure");
+            body = body.select("[href]");
+            body = body.not("[href=/fact-check/entertainment]");
+            body = body.not("[href=/fact-check/world]");
+            body = body.not("[href=/world]");
+            body = body.not("[href=/explainers]");
+
+            for (Element link : body) {
+
+                String linkHref = link.attr("href");
+                if (linkHref.contains("fact-check")) {
+
+                    data_reciever(site_url + linkHref);
+
+
+                }
+            }
+
+        }catch (Exception ignore) { }
+
+
+
+    }
+
+
+
+    static String query_convert(String query)
+    {
+        String new_query = "";
+        for (int i = 0; i< Main.query.length(); i++)
+        {
+            if(query.charAt(i)==' ')
+            {
+                new_query = new_query + "%20";
+            }
+            else new_query = new_query + query.charAt(i);
+        }
+        return new_query;
+    }
+
+    static String data_reciever(String url) throws IOException {
+        String nothing = "";
+        try{
+            System.out.println(url);
+            Document doc = Jsoup.connect(url).timeout(1000).get();
+            String title = doc.select("header.entry-header").text();
+            System.out.println(title);
+            Element story = doc.select("div.story > p").first();
+            System.out.println(story.text());
+            String claim_rating = doc.select("div.claim-value").get(2).select("span.value").text();
+            System.out.println(claim_rating);
+            String claim = doc.select("div.claim-value").get(0).select("span.value").text();
+            System.out.println(claim);
+            String claim_by = doc.select("div.claim-value").get(1).select("span.value").text();
+            System.out.println(claim_by);
+
+        }catch (Exception ignore) { }
+
+
+        return nothing;
+    }
+
+
+
+}

@@ -1,0 +1,99 @@
+package org.example;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
+import java.io.IOException;
+
+
+public class Main {
+    private static final String search_url = "https://www.snopes.com/?s=";
+    private static final String site_url = "https://www.snopes.com/";
+
+    private static final String query = "elon musk";
+
+    public static void main(String[] args) throws IOException {
+        String url = "";
+        String query2 = query_convert(query);
+        url = search_url+query2;
+
+        try{
+//            System.out.println(url);
+            Document doc = Jsoup.connect(url).timeout(10000).get();
+            Elements body = doc.select("div.list-group-item");
+            body = body.select("a.link");
+
+            for (Element link : body) {
+                String linkHref = link.attr("href");
+                if (linkHref.contains("fact-check")) {
+                    System.out.println(linkHref);
+                    data_reciever(linkHref);
+                }
+            }
+
+
+
+
+        }catch (Exception ignore) { }
+
+
+
+    }
+
+
+
+    static String query_convert(String query)
+    {
+        String new_query = "";
+        for (int i = 0; i< Main.query.length(); i++)
+        {
+            if(query.charAt(i)==' ')
+            {
+                new_query = new_query + "+";
+            }
+            else new_query = new_query + query.charAt(i);
+        }
+        return new_query;
+    }
+
+    static String data_reciever(String url) {
+        String nothing = "";
+        try{
+
+            Document doc = Jsoup.connect(url).timeout(10000).get();
+            String title = doc.select("h1.title").text();
+            String claim_rating = doc.select("span.h3").text();
+            String claim = doc.select("div.claim-text.card-body").text();
+            String date = doc.select("li.font-weight-bold.text-muted").select("time").attr("datetime");
+            String story1 = doc.select("blockquote.wp-block-quote").select("p").get(1).text();
+            String story2 = doc.select("blockquote.wp-block-quote").select("p").get(2).text();
+            String story = story1;
+            if(story1.length()<story2.length())
+                story = story2;
+            
+            System.out.println(title);
+            System.out.println(claim_rating);
+            System.out.println(claim);
+            System.out.println(date);
+            System.out.println(story);
+
+
+
+
+
+
+        }catch (Exception ignore) { }
+
+
+        return nothing;
+    }
+
+
+
+}
+
+
+///https://www.snopes.com/?s=did
+///https://www.oneindia.com/fact-check/fact-check-did-pmo-sent-a-don-t-come-message-to-telangana-cm-here-s-the-truth-3401661.html
+//https://thelogicalindian.com/fact-check/100-crore-vaccine-31431
